@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Предложения обмена</h1>
+
+<form method="get">
+    <label>Фильтр по статусу:</label>
+    <select name="status">
+        <option value="">Все</option>
+        <option value="pending" {% if status_filter == "pending" %}selected{% endif %}>Ожидает</option>
+        <option value="accepted" {% if status_filter == "accepted" %}selected{% endif %}>Принята</option>
+        <option value="declined" {% if status_filter == "declined" %}selected{% endif %}>Отклонена</option>
+    </select>
+    <button type="submit">Применить</button>
+</form>
+
+<ul>
+{% for p in proposals %}
+    <li>
+        <b>{{ p.ad_sender.title }}</b> ➔ <b>{{ p.ad_receiver.title }}</b><br>
+        Комментарий: {{ p.comment }} <br>
+        Статус: {{ p.get_status_display }}
+
+        {% if user == p.ad_receiver.user and p.status == 'pending' %}
+            <form method="post" action="{% url 'exchange:proposal_update' p.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button name="status" value="accepted">Принять</button>
+                <button name="status" value="declined">Отклонить</button>
+            </form>
+        {% endif %}
+    </li>
+{% empty %}
+    <li>Нет предложений</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

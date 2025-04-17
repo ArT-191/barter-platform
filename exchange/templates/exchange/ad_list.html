@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Объявления</h1>
+
+<a href="{% url 'exchange:ad_create' %}">Создать новое</a>
+
+<form method="get">
+    <input type="text" name="q" placeholder="Поиск..." value="{{ request.GET.q }}">
+    <input type="text" name="category" placeholder="Категория" value="{{ request.GET.category }}">
+    <input type="text" name="condition" placeholder="Состояние" value="{{ request.GET.condition }}">
+    <button type="submit">Фильтр</button>
+</form>
+
+<ul>
+{% for ad in ads %}
+    <li>
+        <strong>{{ ad.title }}</strong> ({{ ad.category }}, {{ ad.condition }})
+        <br>{{ ad.description }}
+        <br>
+        <a href="{% url 'exchange:ad_edit' ad.id %}">Редактировать</a> |
+        <a href="{% url 'exchange:ad_delete' ad.id %}" onclick="return confirm('Удалить объявление?');">Удалить</a>
+    </li>
+{% empty %}
+    <li>Нет объявлений</li>
+{% endfor %}
+</ul>
+
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">&laquo; Назад</a>
+    {% endif %}
+
+    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперёд &raquo;</a>
+    {% endif %}
+</div>
+
+{% endblock %}
